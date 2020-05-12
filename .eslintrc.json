@@ -25,6 +25,7 @@
         "react",
         "prettier"
     ],
+    "ignorePatterns": ["serviceWorker.js"],
     "rules": {
         "prettier/prettier": ["error", {
             "singleQuote": true,

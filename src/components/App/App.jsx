@@ -6,17 +6,7 @@ import Home from '../Home';
 import Login from '../Login';
 import Signup from '../Signup';
 
-const mapStateToProps = (state) => {
-  const props = {
-    isAuth: state.isAuth,
-  };
-
-  return props;
-};
-
-const App = (props) => {
-  const { isAuth } = props;
-
+const App = () => {
   return (
     <MainWrapper>
       <Router>
@@ -28,7 +18,7 @@ const App = (props) => {
       </Router>
     </MainWrapper>
   );
-}
+};
 
 const MainWrapper = styled.div`
   display: flex;
@@ -36,8 +26,13 @@ const MainWrapper = styled.div`
   align-items: center;
   padding: 50px 0;
   height: 100vh;
-  background: rgb(2,0,36);
-  background: linear-gradient(25deg, rgba(2,0,36,1) 0%, rgba(9,9,121,1) 20%, rgba(0,212,255,1) 100%);
+  background: rgb(2, 0, 36);
+  background: linear-gradient(
+    25deg,
+    rgba(2, 0, 36, 1) 0%,
+    rgba(9, 9, 121, 1) 20%,
+    rgba(0, 212, 255, 1) 100%
+  );
 
   & .content {
     width: 40%;
@@ -62,4 +57,4 @@ const MainWrapper = styled.div`
   }
 `;
 
-export default connect(mapStateToProps)(App);
+export default connect(null)(App);
