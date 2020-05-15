@@ -7,7 +7,8 @@ import { Button, Input } from 'antd';
 import styled from 'styled-components';
 import classNames from 'classnames';
 import * as actions from '../../actions';
-import { formatRegisterErrorsToFormikErrors } from '../../utilities';
+import { LOGIN_LINK } from '../../routes/endpoints';
+import { formatRegisterErrorsToFormikErrors } from '../../utilities/formatServerErrors';
 import 'antd/dist/antd.css';
 
 const mapStateToProps = (state) => {
@@ -41,7 +42,7 @@ class Signup extends React.Component {
   renderRedirect = () => {
     const { redirect } = this.state;
     if (redirect) {
-      return <Redirect to="/login" />;
+      return <Redirect to={LOGIN_LINK} />;
     }
     return null;
   };
@@ -116,7 +117,7 @@ class Signup extends React.Component {
                   Sign Up
                 </Button>
                 <Button type="link">
-                  <Link to="/login">Login</Link>
+                  <Link to={LOGIN_LINK}>Login</Link>
                 </Button>
               </ButtonsWrapper>
             </Form>

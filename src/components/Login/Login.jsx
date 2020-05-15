@@ -7,6 +7,7 @@ import { Input, Button } from 'antd';
 import styled from 'styled-components';
 import classNames from 'classnames';
 import * as actions from '../../actions';
+import { HOME_LINK, REGISTER_LINK } from '../../routes/endpoints';
 import 'antd/dist/antd.css';
 
 const mapStateToProps = (state) => {
@@ -23,11 +24,6 @@ const mapDispatchToProps = {
 };
 
 class Login extends React.Component {
-  constructor(props) {
-    super(props);
-    this.resetButtonRef = React.createRef();
-  }
-
   state = {
     redirect: false,
   };
@@ -35,23 +31,18 @@ class Login extends React.Component {
   componentDidUpdate() {
     const { user, userLoginFething } = this.props;
     if (userLoginFething === 'finished' && !user.errors) {
-      this.onResetForm();
       this.setRedirect();
     }
   }
 
-  onResetForm = () => {
-    this.resetButtonRef.current.click();
-  };
-
-  setRedirect = () => {
+  setRedirect() {
     this.setState({ redirect: true });
-  };
+  }
 
   renderRedirect = () => {
     const { redirect } = this.state;
     if (redirect) {
-      return <Redirect to="/" />;
+      return <Redirect to={HOME_LINK} />;
     }
     return null;
   };
@@ -73,11 +64,12 @@ class Login extends React.Component {
         <h1>Autorization:</h1>
         <Formik
           initialValues={initialValues}
-          onSubmit={(values) => {
-            signin(values);
+          onSubmit={async (values, { resetForm }) => {
+            await signin(values);
+            resetForm();
           }}
         >
-          {({ errors, touched, handleReset }) => (
+          {({ errors, touched }) => (
             <Form>
               <InputWrapper>
                 <Field
@@ -108,16 +100,9 @@ class Login extends React.Component {
                   {user.errors && <span className="error">{user.errors}</span>}
                 </div>
                 <Button type="link">
-                  <Link to="/signup">Create a new user</Link>
+                  <Link to={REGISTER_LINK}>Create a new user</Link>
                 </Button>
               </ButtonsWrapper>
-              <button
-                className="visually-hidden"
-                aria-label="Clear form inputs"
-                type="button"
-                ref={this.resetButtonRef}
-                onClick={handleReset}
-              />
             </Form>
           )}
         </Formik>

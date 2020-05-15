@@ -5,15 +5,16 @@ import styled from 'styled-components';
 import Home from '../Home';
 import Login from '../Login';
 import Signup from '../Signup';
+import * as routesLinks from '../../routes/endpoints';
 
 const App = () => {
   return (
     <MainWrapper>
       <Router>
         <Switch>
-          <Route path="/" exact component={Home} />
-          <Route path="/login" component={Login} />
-          <Route path="/signup" component={Signup} />
+          <Route path={routesLinks.HOME_LINK} exact component={Home} />
+          <Route path={routesLinks.LOGIN_LINK} exact component={Login} />
+          <Route path={routesLinks.REGISTER_LINK} exact component={Signup} />
         </Switch>
       </Router>
     </MainWrapper>

@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import { Button } from 'antd';
 import styled from 'styled-components';
 import * as actions from '../../actions';
+import { LOGIN_LINK } from '../../routes/endpoints';
 
 const mapStateToProps = (state) => {
   const props = {
@@ -25,6 +26,7 @@ class Home extends React.Component {
 
   componentDidMount() {
     const { user } = this.props;
+
     if (!user.token) {
       this.setRedirect();
     }
@@ -32,6 +34,7 @@ class Home extends React.Component {
 
   componentDidUpdate() {
     const { user } = this.props;
+
     if (!user.token) {
       this.setRedirect();
     }
@@ -44,15 +47,15 @@ class Home extends React.Component {
   renderRedirect = () => {
     const { redirect } = this.state;
     if (redirect) {
-      return <Redirect to="/login" />;
+      return <Redirect to={LOGIN_LINK} />;
     }
     return null;
   };
 
-  logout = () => {
+  logout() {
     const { logout } = this.props;
     logout();
-  };
+  }
 
   render() {
     const { user } = this.props;
