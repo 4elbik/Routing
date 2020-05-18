@@ -1,11 +1,11 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Redirect } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { Button } from 'antd';
 import styled from 'styled-components';
 import * as actions from '../../actions';
-import { LOGIN_LINK } from '../../routes/endpoints';
+import AuthRedirectComponent from '../../hoc/AuthRedirectComponent';
+import AuthWithTocken from '../../hoc/AuthWithTocken';
 
 const mapStateToProps = (state) => {
   const props = {
@@ -20,42 +20,14 @@ const mapDispatchToProps = {
 };
 
 class Home extends React.Component {
-  state = {
-    redirect: false,
-  };
-
-  componentDidMount() {
-    const { user } = this.props;
-
-    if (!user.token) {
-      this.setRedirect();
-    }
-  }
-
-  componentDidUpdate() {
-    const { user } = this.props;
-
-    if (!user.token) {
-      this.setRedirect();
-    }
-  }
-
-  setRedirect = () => {
-    this.setState({ redirect: true });
-  };
-
-  renderRedirect = () => {
-    const { redirect } = this.state;
-    if (redirect) {
-      return <Redirect to={LOGIN_LINK} />;
-    }
-    return null;
-  };
-
-  logout() {
+  logout = () => {
     const { logout } = this.props;
+    // Какие-то сомнения в использовании нативного JS. Правильно ли что это дело тут происходит?
+    // Суть в том, что при разлогировании нужно и из local storage убирать токен. И мне кажется эта логика
+    // должна быть в файле actions, но я как-то не смог допереть как это там можно сделать
+    localStorage.removeItem('token');
     logout();
-  }
+  };
 
   render() {
     const { user } = this.props;
@@ -63,7 +35,6 @@ class Home extends React.Component {
     return (
       <div className="content">
         <h1>Home page</h1>
-        {this.renderRedirect()}
         <UserWrapper>
           <span className="user-name">{user.username}</span>
           <Button type="link" onClick={this.logout}>
@@ -96,4 +67,7 @@ Home.propTypes = {
   logout: PropTypes.func.isRequired,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(Home);
+const IfTockenExists = AuthWithTocken(Home);
+const WithRedirectComponent = AuthRedirectComponent(IfTockenExists);
+
+export default connect(mapStateToProps, mapDispatchToProps)(WithRedirectComponent);

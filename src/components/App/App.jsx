@@ -1,5 +1,4 @@
 import React from 'react';
-import { connect } from 'react-redux';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import styled from 'styled-components';
 import Home from '../Home';
@@ -58,4 +57,4 @@ const MainWrapper = styled.div`
   }
 `;
 
-export default connect(null)(App);
+export default App;

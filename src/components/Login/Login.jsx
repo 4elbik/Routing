@@ -8,12 +8,14 @@ import styled from 'styled-components';
 import classNames from 'classnames';
 import * as actions from '../../actions';
 import { HOME_LINK, REGISTER_LINK } from '../../routes/endpoints';
+import AuthWithTocken from '../../hoc/AuthWithTocken';
 import 'antd/dist/antd.css';
 
 const mapStateToProps = (state) => {
   const props = {
-    userLoginFething: state.userLoginFething,
+    userLoginFetching: state.userLoginFetching,
     user: state.user,
+    isAuth: state.isAuth,
   };
 
   return props;
@@ -28,9 +30,17 @@ class Login extends React.Component {
     redirect: false,
   };
 
+  componentDidMount() {
+    const { isAuth } = this.props;
+
+    if (isAuth) {
+      this.setRedirect();
+    }
+  }
+
   componentDidUpdate() {
-    const { user, userLoginFething } = this.props;
-    if (userLoginFething === 'finished' && !user.errors) {
+    const { user, userLoginFetching } = this.props;
+    if (userLoginFetching === 'finished' && !user.errors) {
       this.setRedirect();
     }
   }
@@ -48,25 +58,22 @@ class Login extends React.Component {
   };
 
   render() {
-    const { user, userLoginFething, signin } = this.props;
+    const { user, userLoginFetching, signin } = this.props;
 
     const fieldErrorClassNames = (field, errors, touched) => {
       return classNames({ error: errors[field] && touched[field] });
-    };
-
-    const initialValues = {
-      email: '',
-      password: '',
     };
 
     return (
       <div className="content">
         <h1>Autorization:</h1>
         <Formik
-          initialValues={initialValues}
-          onSubmit={async (values, { resetForm }) => {
-            await signin(values);
-            resetForm();
+          initialValues={{
+            email: '',
+            password: '',
+          }}
+          onSubmit={(values) => {
+            signin(values);
           }}
         >
           {({ errors, touched }) => (
@@ -93,9 +100,9 @@ class Login extends React.Component {
                   <Button
                     type="primary"
                     htmlType="submit"
-                    disabled={userLoginFething === 'requested'}
+                    disabled={userLoginFetching === 'requested'}
                   >
-                    Sign In
+                    Sing In
                   </Button>
                   {user.errors && <span className="error">{user.errors}</span>}
                 </div>
@@ -132,8 +139,11 @@ Login.defaultProps = {
 
 Login.propTypes = {
   user: PropTypes.instanceOf(Object),
-  userLoginFething: PropTypes.string.isRequired,
+  userLoginFetching: PropTypes.string.isRequired,
   signin: PropTypes.func.isRequired,
+  isAuth: PropTypes.bool.isRequired,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(Login);
+const IfTockenExists = AuthWithTocken(Login);
+
+export default connect(mapStateToProps, mapDispatchToProps)(IfTockenExists);

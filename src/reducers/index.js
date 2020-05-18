@@ -2,7 +2,7 @@ import { combineReducers } from 'redux';
 import { handleActions } from 'redux-actions';
 import * as actions from '../actions';
 
-const userLoginFething = handleActions(
+const userLoginFetching = handleActions(
   {
     [actions.loginUserRequest]() {
       return 'requested';
@@ -17,7 +17,7 @@ const userLoginFething = handleActions(
   'none'
 );
 
-const userRegisterFething = handleActions(
+const userRegisterFetching = handleActions(
   {
     [actions.registerUserRequest]() {
       return 'requested';
@@ -47,8 +47,21 @@ const user = handleActions(
   {}
 );
 
+const isAuth = handleActions(
+  {
+    [actions.loginUserSuccess]() {
+      return true;
+    },
+    [actions.logoutUser]() {
+      return false;
+    },
+  },
+  false
+);
+
 export default combineReducers({
-  userLoginFething,
-  userRegisterFething,
+  userLoginFetching,
+  userRegisterFetching,
   user,
+  isAuth,
 });

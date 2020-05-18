@@ -13,7 +13,7 @@ import 'antd/dist/antd.css';
 
 const mapStateToProps = (state) => {
   const props = {
-    userRegisterFething: state.userRegisterFething,
+    userRegisterFetching: state.userRegisterFetching,
   };
 
   return props;
@@ -29,8 +29,8 @@ class Signup extends React.Component {
   };
 
   componentDidUpdate() {
-    const { userRegisterFething } = this.props;
-    if (userRegisterFething === 'finished') {
+    const { userRegisterFetching } = this.props;
+    if (userRegisterFetching === 'finished') {
       this.setRedirect();
     }
   }
@@ -48,7 +48,7 @@ class Signup extends React.Component {
   };
 
   render() {
-    const { userRegisterFething, register } = this.props;
+    const { userRegisterFetching, register } = this.props;
 
     const fieldErrorClassNames = (field, errors, touched) => {
       return classNames({ error: errors[field] && touched[field] });
@@ -112,7 +112,7 @@ class Signup extends React.Component {
                 <Button
                   type="primary"
                   htmlType="submit"
-                  disabled={userRegisterFething === 'requested'}
+                  disabled={userRegisterFetching === 'requested'}
                 >
                   Sign Up
                 </Button>
@@ -148,7 +148,7 @@ const ButtonsWrapper = styled.div`
 `;
 
 Signup.propTypes = {
-  userRegisterFething: PropTypes.string.isRequired,
+  userRegisterFetching: PropTypes.string.isRequired,
   register: PropTypes.func.isRequired,
 };
 
