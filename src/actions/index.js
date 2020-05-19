@@ -13,7 +13,7 @@ export const registerUserSuccess = createAction('USER_REGISTER_SUCCESS');
 export const registerUserFailure = createAction('USER_REGISTER_FAILURE');
 
 const api = axios.create({
-  baseURL: 'http://conduit.productionready.io/api',
+  baseURL: 'https://conduit.productionready.io/api',
 });
 api.interceptors.request.use(
   (config) => {
