@@ -22,102 +22,75 @@ const mapStateToProps = (state) => {
 };
 
 const mapDispatchToProps = {
-  signin: actions.loginUser,
+  singin: actions.loginUser,
 };
 
-class Login extends React.Component {
-  state = {
-    redirect: false,
+const Login = (props) => {
+  const { user, isAuth, userLoginFetching, singin } = props;
+
+  if (isAuth) {
+    localStorage.setItem('token', user.token);
+    return <Redirect to={HOME_LINK} />;
+  }
+
+  const fieldErrorClassNames = (field, errors, touched) => {
+    return classNames({ error: errors[field] && touched[field] });
   };
 
-  componentDidMount() {
-    const { isAuth } = this.props;
-
-    if (isAuth) {
-      this.setRedirect();
-    }
-  }
-
-  componentDidUpdate() {
-    const { user, userLoginFetching } = this.props;
-    if (userLoginFetching === 'finished' && !user.errors) {
-      this.setRedirect();
-    }
-  }
-
-  setRedirect() {
-    this.setState({ redirect: true });
-  }
-
-  renderRedirect = () => {
-    const { redirect } = this.state;
-    if (redirect) {
-      return <Redirect to={HOME_LINK} />;
-    }
-    return null;
-  };
-
-  render() {
-    const { user, userLoginFetching, signin } = this.props;
-
-    const fieldErrorClassNames = (field, errors, touched) => {
-      return classNames({ error: errors[field] && touched[field] });
-    };
-
-    return (
-      <div className="content">
-        <h1>Autorization:</h1>
-        <Formik
-          initialValues={{
-            email: '',
-            password: '',
-          }}
-          onSubmit={(values) => {
-            signin(values);
-          }}
-        >
-          {({ errors, touched }) => (
-            <Form>
-              <InputWrapper>
-                <Field
-                  as={Input}
-                  className={fieldErrorClassNames('email', errors, touched)}
-                  type="email"
-                  name="email"
-                  placeholder="Email"
-                />
-              </InputWrapper>
-              <InputWrapper>
-                <Field
-                  as={Input.Password}
-                  className={fieldErrorClassNames('password', errors, touched)}
-                  name="password"
-                  placeholder="Input your password"
-                />
-              </InputWrapper>
-              <ButtonsWrapper>
-                <div>
-                  <Button
-                    type="primary"
-                    htmlType="submit"
-                    disabled={userLoginFetching === 'requested'}
-                  >
-                    Sing In
-                  </Button>
-                  {user.errors && <span className="error">{user.errors}</span>}
-                </div>
-                <Button type="link">
-                  <Link to={REGISTER_LINK}>Create a new user</Link>
+  return (
+    <div className="content">
+      <h1>Autorization:</h1>
+      <Formik
+        initialValues={{
+          email: '',
+          password: '',
+        }}
+        onSubmit={(values) => {
+          singin(values);
+        }}
+      >
+        {({ errors, touched }) => (
+          <Form>
+            <InputWrapper>
+              <Field
+                as={Input}
+                className={fieldErrorClassNames('email', errors, touched)}
+                type="email"
+                name="email"
+                placeholder="Email"
+                disabled={userLoginFetching === 'requested'}
+              />
+            </InputWrapper>
+            <InputWrapper>
+              <Field
+                as={Input.Password}
+                className={fieldErrorClassNames('password', errors, touched)}
+                name="password"
+                placeholder="Input your password"
+                disabled={userLoginFetching === 'requested'}
+              />
+            </InputWrapper>
+            <ButtonsWrapper>
+              <div>
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  disabled={userLoginFetching === 'requested'}
+                >
+                  Sing In
                 </Button>
-              </ButtonsWrapper>
-            </Form>
-          )}
-        </Formik>
-        {this.renderRedirect()}
-      </div>
-    );
-  }
-}
+                {user.errors && <span className="error">{user.errors}</span>}
+              </div>
+              <Button type="link">
+                <Link to={REGISTER_LINK}>Create a new user</Link>
+              </Button>
+            </ButtonsWrapper>
+          </Form>
+        )}
+      </Formik>
+    </div>
+  );
+};
 
 const InputWrapper = styled.div`
   margin-bottom: 20px;
@@ -140,7 +113,7 @@ Login.defaultProps = {
 Login.propTypes = {
   user: PropTypes.instanceOf(Object),
   userLoginFetching: PropTypes.string.isRequired,
-  signin: PropTypes.func.isRequired,
+  singin: PropTypes.func.isRequired,
   isAuth: PropTypes.bool.isRequired,
 };
 

@@ -1,5 +1,5 @@
-import axios from 'axios';
 import { createAction } from 'redux-actions';
+import api from '../fetchConfig';
 import { formatLoginErrorToStr } from '../utilities/formatServerErrors';
 
 export const loginUserRequest = createAction('USER_LOGIN_REQUEST');
@@ -12,30 +12,10 @@ export const registerUserRequest = createAction('USER_REGISTER_REQUEST');
 export const registerUserSuccess = createAction('USER_REGISTER_SUCCESS');
 export const registerUserFailure = createAction('USER_REGISTER_FAILURE');
 
-const api = axios.create({
-  baseURL: 'https://conduit.productionready.io/api',
-});
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      // Линтер ругается на изменение ключа объекта "no-param-reassign"
-      // А как тогда по-другому добавить заголовок авторизации я не совсем понимаю
-      config.headers.common.Authorization = `Token ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    // Do something with request error
-    return Promise.reject(error);
-  }
-);
-
 export const loginUser = (user) => async (dispatch) => {
   dispatch(loginUserRequest());
   try {
     const response = await api.post('/users/login', { user });
-    localStorage.setItem('token', response.data.user.token);
     dispatch(loginUserSuccess(response.data));
   } catch (err) {
     const errStr = formatLoginErrorToStr(err);
