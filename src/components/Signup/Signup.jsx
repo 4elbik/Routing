@@ -14,7 +14,6 @@ import AuthWithTocken from '../../hoc/AuthWithTocken';
 
 const mapStateToProps = (state) => {
   const props = {
-    isAuth: state.isAuth,
     userRegisterFetching: state.userRegisterFetching,
   };
 
@@ -26,9 +25,9 @@ const mapDispatchToProps = {
 };
 
 const Signup = (props) => {
-  const { isAuth, userRegisterFetching, register } = props;
+  const { userRegisterFetching, register } = props;
 
-  if (isAuth || userRegisterFetching === 'finished') {
+  if (userRegisterFetching === 'finished') {
     return <Redirect to={LOGIN_LINK} />;
   }
 
@@ -129,7 +128,6 @@ const ButtonsWrapper = styled.div`
 `;
 
 Signup.propTypes = {
-  isAuth: PropTypes.bool.isRequired,
   userRegisterFetching: PropTypes.string.isRequired,
   register: PropTypes.func.isRequired,
 };

@@ -1,13 +1,13 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Formik, Form, Field } from 'formik';
-import { Link, Redirect } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { Input, Button } from 'antd';
 import styled from 'styled-components';
 import classNames from 'classnames';
 import * as actions from '../../actions';
-import { HOME_LINK, REGISTER_LINK } from '../../routes/endpoints';
+import { REGISTER_LINK } from '../../routes/endpoints';
 import AuthWithTocken from '../../hoc/AuthWithTocken';
 import 'antd/dist/antd.css';
 
@@ -15,7 +15,6 @@ const mapStateToProps = (state) => {
   const props = {
     userLoginFetching: state.userLoginFetching,
     user: state.user,
-    isAuth: state.isAuth,
   };
 
   return props;
@@ -26,12 +25,7 @@ const mapDispatchToProps = {
 };
 
 const Login = (props) => {
-  const { user, isAuth, userLoginFetching, singin } = props;
-
-  if (isAuth) {
-    localStorage.setItem('token', user.token);
-    return <Redirect to={HOME_LINK} />;
-  }
+  const { user, userLoginFetching, singin } = props;
 
   const fieldErrorClassNames = (field, errors, touched) => {
     return classNames({ error: errors[field] && touched[field] });
@@ -114,7 +108,6 @@ Login.propTypes = {
   user: PropTypes.instanceOf(Object),
   userLoginFetching: PropTypes.string.isRequired,
   singin: PropTypes.func.isRequired,
-  isAuth: PropTypes.bool.isRequired,
 };
 
 const IfTockenExists = AuthWithTocken(Login);

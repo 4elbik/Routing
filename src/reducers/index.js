@@ -1,6 +1,7 @@
 import { combineReducers } from 'redux';
 import { handleActions } from 'redux-actions';
 import * as actions from '../actions';
+import * as actionsArticle from './articles';
 
 const userLoginFetching = handleActions(
   {
@@ -64,4 +65,9 @@ export default combineReducers({
   userRegisterFetching,
   user,
   isAuth,
+  articlesFetching: actionsArticle.articlesFetching,
+  articles: actionsArticle.articles,
+  favoriteArticleFetching: actionsArticle.favoriteArticleFetching,
+  unFavoriteArticleFetching: actionsArticle.unFavoriteArticleFetching,
+  activeTagName: actionsArticle.activeTagName,
 });

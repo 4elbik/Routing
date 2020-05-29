@@ -1,19 +1,63 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import PrivateRoute from '../PrivateRoute';
 import Home from '../Home';
 import Login from '../Login';
 import Signup from '../Signup';
+// import Article from '../Article';
 import * as routesLinks from '../../routes/endpoints';
 
-const App = () => {
+const mapStateToProps = (state) => {
+  const props = {
+    user: state.user,
+    isAuth: state.isAuth,
+  };
+
+  return props;
+};
+
+const App = (props) => {
+  const { user, isAuth } = props;
+
+  if (isAuth) {
+    // Из-за приватных роутов конкретно в Login компоненте
+    // не закинуть токен в локалстор. Поэтому это дело происходит здесь.
+    // Это нормально?
+    localStorage.setItem('token', user.token);
+  }
+
   return (
     <MainWrapper>
       <Router>
         <Switch>
-          <Route path={routesLinks.HOME_LINK} exact component={Home} />
-          <Route path={routesLinks.LOGIN_LINK} exact component={Login} />
-          <Route path={routesLinks.REGISTER_LINK} exact component={Signup} />
+          <PrivateRoute
+            isAuth={isAuth}
+            path={routesLinks.HOME_LINK}
+            redirectTo={routesLinks.LOGIN_LINK}
+            exact
+          >
+            <Home />
+          </PrivateRoute>
+          <PrivateRoute
+            isAuth={!isAuth}
+            path={routesLinks.LOGIN_LINK}
+            redirectTo={routesLinks.HOME_LINK}
+            exact
+          >
+            <Login />
+          </PrivateRoute>
+          <PrivateRoute
+            isAuth={!isAuth}
+            path={routesLinks.REGISTER_LINK}
+            redirectTo={routesLinks.HOME_LINK}
+            exact
+          >
+            <Signup />
+          </PrivateRoute>
+          {/* <Route path={`${routesLinks.ARTICLE_LINK}/:slug`} component={Article} /> */}
         </Switch>
       </Router>
     </MainWrapper>
@@ -25,7 +69,7 @@ const MainWrapper = styled.div`
   justify-content: center;
   align-items: center;
   padding: 50px 0;
-  height: 100vh;
+  min-height: 100vh;
   background: rgb(2, 0, 36);
   background: linear-gradient(
     25deg,
@@ -57,4 +101,9 @@ const MainWrapper = styled.div`
   }
 `;
 
-export default App;
+App.propTypes = {
+  user: PropTypes.instanceOf(Object).isRequired,
+  isAuth: PropTypes.bool.isRequired,
+};
+
+export default connect(mapStateToProps)(App);
