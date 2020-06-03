@@ -12,7 +12,6 @@ import * as routesLinks from '../../routes/endpoints';
 
 const mapStateToProps = (state) => {
   const props = {
-    user: state.user,
     isAuth: state.isAuth,
   };
 
@@ -20,21 +19,14 @@ const mapStateToProps = (state) => {
 };
 
 const App = (props) => {
-  const { user, isAuth } = props;
-
-  if (isAuth) {
-    // Из-за приватных роутов конкретно в Login компоненте
-    // не закинуть токен в локалстор. Поэтому это дело происходит здесь.
-    // Это нормально?
-    localStorage.setItem('token', user.token);
-  }
+  const { isAuth } = props;
 
   return (
     <MainWrapper>
       <Router>
         <Switch>
           <PrivateRoute
-            isAuth={isAuth}
+            condition={isAuth}
             path={routesLinks.HOME_LINK}
             redirectTo={routesLinks.LOGIN_LINK}
             exact
@@ -42,7 +34,7 @@ const App = (props) => {
             <Home />
           </PrivateRoute>
           <PrivateRoute
-            isAuth={!isAuth}
+            condition={!isAuth}
             path={routesLinks.LOGIN_LINK}
             redirectTo={routesLinks.HOME_LINK}
             exact
@@ -50,7 +42,7 @@ const App = (props) => {
             <Login />
           </PrivateRoute>
           <PrivateRoute
-            isAuth={!isAuth}
+            condition={!isAuth}
             path={routesLinks.REGISTER_LINK}
             redirectTo={routesLinks.HOME_LINK}
             exact
@@ -102,7 +94,6 @@ const MainWrapper = styled.div`
 `;
 
 App.propTypes = {
-  user: PropTypes.instanceOf(Object).isRequired,
   isAuth: PropTypes.bool.isRequired,
 };
 

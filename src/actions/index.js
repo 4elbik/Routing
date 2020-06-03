@@ -16,6 +16,7 @@ export const loginUser = (user) => async (dispatch) => {
   dispatch(loginUserRequest());
   try {
     const response = await api.post('/users/login', { user });
+    localStorage.setItem('token', response.data.user.token);
     dispatch(loginUserSuccess(response.data));
   } catch (err) {
     const errStr = formatLoginErrorToStr(err);
@@ -28,9 +29,12 @@ export const loginUserToken = () => async (dispatch) => {
   dispatch(loginUserRequest());
   try {
     const response = await api.get('/user');
+    localStorage.setItem('token', response.data.user.token);
     dispatch(loginUserSuccess(response.data));
   } catch (err) {
-    dispatch(loginUserFailure({ errors: err.response }));
+    localStorage.removeItem('token');
+    dispatch(logoutUser());
+    dispatch(loginUserFailure({ errors: 'Please log in again' }));
     throw err;
   }
 };
