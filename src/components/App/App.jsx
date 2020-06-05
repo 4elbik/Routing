@@ -7,7 +7,7 @@ import PrivateRoute from '../PrivateRoute';
 import Home from '../Home';
 import Login from '../Login';
 import Signup from '../Signup';
-// import Article from '../Article';
+import Article from '../Article';
 import * as routesLinks from '../../routes/endpoints';
 
 const mapStateToProps = (state) => {
@@ -25,14 +25,7 @@ const App = (props) => {
     <MainWrapper>
       <Router>
         <Switch>
-          <PrivateRoute
-            condition={isAuth}
-            path={routesLinks.HOME_LINK}
-            redirectTo={routesLinks.LOGIN_LINK}
-            exact
-          >
-            <Home />
-          </PrivateRoute>
+          <Route path={routesLinks.HOME_LINK} exact component={Home} />
           <PrivateRoute
             condition={!isAuth}
             path={routesLinks.LOGIN_LINK}
@@ -49,7 +42,7 @@ const App = (props) => {
           >
             <Signup />
           </PrivateRoute>
-          {/* <Route path={`${routesLinks.ARTICLE_LINK}/:slug`} component={Article} /> */}
+          <Route path={`${routesLinks.ARTICLE_LINK}/:slug`} component={Article} />
         </Switch>
       </Router>
     </MainWrapper>

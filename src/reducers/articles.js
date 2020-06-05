@@ -18,8 +18,8 @@ export const articlesFetching = handleActions(
 
 export const favoriteArticleFetching = handleActions(
   {
-    [actions.favoriteArticleRequest]() {
-      return 'requested';
+    [actions.favoriteArticleRequest](_state, { payload: slug }) {
+      return `requested ${slug}`;
     },
     [actions.favoriteArticleSuccess]() {
       return 'finished';
@@ -33,8 +33,8 @@ export const favoriteArticleFetching = handleActions(
 
 export const unFavoriteArticleFetching = handleActions(
   {
-    [actions.unFavoriteArticleRequest]() {
-      return 'requested';
+    [actions.unFavoriteArticleRequest](_state, { payload: slug }) {
+      return `requested ${slug}`;
     },
     [actions.unFavoriteArticleSuccess]() {
       return 'finished';

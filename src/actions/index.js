@@ -12,6 +12,8 @@ export const registerUserRequest = createAction('USER_REGISTER_REQUEST');
 export const registerUserSuccess = createAction('USER_REGISTER_SUCCESS');
 export const registerUserFailure = createAction('USER_REGISTER_FAILURE');
 
+export const resetWindowErrorMessage = createAction('RESET_WINDOW_ERRORS_MESSAGE');
+
 export const loginUser = (user) => async (dispatch) => {
   dispatch(loginUserRequest());
   try {

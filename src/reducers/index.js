@@ -1,7 +1,8 @@
 import { combineReducers } from 'redux';
 import { handleActions } from 'redux-actions';
 import * as actions from '../actions';
-import * as actionsArticle from './articles';
+import * as actionsArticle from '../actions/articles';
+import * as reducerArticle from './articles';
 
 const userLoginFetching = handleActions(
   {
@@ -60,14 +61,30 @@ const isAuth = handleActions(
   false
 );
 
+const errorMessage = handleActions(
+  {
+    [actionsArticle.favoriteArticleFailure](_state, { payload: error }) {
+      return error;
+    },
+    [actionsArticle.unFavoriteArticleFailure](_state, { payload: error }) {
+      return error;
+    },
+    [actions.resetWindowErrorMessage]() {
+      return '';
+    }
+  },
+  ''
+)
+
 export default combineReducers({
   userLoginFetching,
   userRegisterFetching,
   user,
   isAuth,
-  articlesFetching: actionsArticle.articlesFetching,
-  articles: actionsArticle.articles,
-  favoriteArticleFetching: actionsArticle.favoriteArticleFetching,
-  unFavoriteArticleFetching: actionsArticle.unFavoriteArticleFetching,
-  activeTagName: actionsArticle.activeTagName,
+  errorMessage,
+  articlesFetching: reducerArticle.articlesFetching,
+  articles: reducerArticle.articles,
+  favoriteArticleFetching: reducerArticle.favoriteArticleFetching,
+  unFavoriteArticleFetching: reducerArticle.unFavoriteArticleFetching,
+  activeTagName: reducerArticle.activeTagName,
 });

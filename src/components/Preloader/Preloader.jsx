@@ -22,7 +22,7 @@ const PreloaderWrapper = styled.div`
   height: 100%;
   margin: 0;
   padding: 0;
-  position: absolute;
+  position: relative;
 
   .backdrop {
     display: -webkit-box;
