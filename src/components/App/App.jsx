@@ -8,6 +8,7 @@ import Home from '../Home';
 import Login from '../Login';
 import Signup from '../Signup';
 import Article from '../Article';
+import AddArticle from '../AddArticle';
 import * as routesLinks from '../../routes/endpoints';
 
 const mapStateToProps = (state) => {
@@ -43,6 +44,9 @@ const App = (props) => {
             <Signup />
           </PrivateRoute>
           <Route path={`${routesLinks.ARTICLE_LINK}/:slug`} component={Article} />
+          <PrivateRoute condition={isAuth} path={routesLinks.ADD_ARTICLE_LINK} redirectTo={routesLinks.LOGIN_LINK}>
+            <AddArticle />
+          </PrivateRoute>
         </Switch>
       </Router>
     </MainWrapper>

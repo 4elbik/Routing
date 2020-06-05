@@ -192,6 +192,11 @@ class Home extends React.Component {
     return (
       <div className="content">
         <h1>Home page</h1>
+        <div>
+          <Button type="primary">
+            <Link to={ADD_ARTICLE_LINK}>Add new article</Link>
+          </Button>
+        </div>
         <UserWrapper>
           <span className="user-name">{user.username}</span>
           {isAuth ? <Button type="link" onClick={this.logout}>Log out</Button> : <Link to={LOGIN_LINK}>Log In</Link> }
