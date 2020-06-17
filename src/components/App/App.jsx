@@ -8,8 +8,9 @@ import Home from '../Home';
 import Login from '../Login';
 import Signup from '../Signup';
 import Article from '../Article';
-import AddArticle from '../AddArticle';
+import AddEditArticle from '../AddEditArticle';
 import * as routesLinks from '../../routes/endpoints';
+import Page404 from '../Page404/Page404';
 
 const mapStateToProps = (state) => {
   const props = {
@@ -44,9 +45,16 @@ const App = (props) => {
             <Signup />
           </PrivateRoute>
           <Route path={`${routesLinks.ARTICLE_LINK}/:slug`} component={Article} />
-          <PrivateRoute condition={isAuth} path={routesLinks.ADD_ARTICLE_LINK} redirectTo={routesLinks.LOGIN_LINK}>
-            <AddArticle />
+          <PrivateRoute
+            condition={isAuth}
+            path={routesLinks.ADD_ARTICLE_LINK}
+            redirectTo={routesLinks.LOGIN_LINK}
+          >
+            <AddEditArticle />
           </PrivateRoute>
+          <Route>
+            <Page404 />
+          </Route>
         </Switch>
       </Router>
     </MainWrapper>
@@ -79,7 +87,7 @@ const MainWrapper = styled.div`
 
     & h1 {
       margin: 0;
-      margin-bottom: 20px;
+      // margin-bottom: 20px;
       font-size: 24px;
       font-weight: 400;
     }

@@ -16,7 +16,21 @@ export const unFavoriteArticleRequest = createAction('REMOVE_LIKE_REQUEST');
 export const unFavoriteArticleSuccess = createAction('REMOVE_LIKE_SUCCESS');
 export const unFavoriteArticleFailure = createAction('REMOVE_LIKE_FAILURE');
 
+export const addArticleRequest = createAction('ADD_ARTICLE_REQUEST');
+export const addArticleSuccess = createAction('ADD_ARTICLE_SUCCESS');
+export const addArticleFailure = createAction('ADD_ARTICLE_FAILURE');
+
+export const updateArticleRequest = createAction('UPDATE_ARTICLE_REQUEST');
+export const updateArticleSuccess = createAction('UPDATE_ARTICLE_SUCCESS');
+export const updateArticleFailure = createAction('UPDATE_ARTICLE_FAILURE');
+
+export const deleteArticleRequest = createAction('DELETE_ARTICLE_REQUEST');
+export const deleteArticleSuccess = createAction('DELETE_ARTICLE_SUCCESS');
+export const deleteArticleFailure = createAction('DELETE_ARTICLE_FAILURE');
+
 export const activeTagName = createAction('CHANGE_ACTIVE_TAG_NAME');
+
+export const editArticleFetchingRestored = createAction('RESET_EDIT_ARTICLE_FETCHING');
 
 export const getArticles = (options) => async (dispatch) => {
   dispatch(articlesRequest());
@@ -68,3 +82,36 @@ export const unFavoriteArticle = (slug) => async (dispatch) => {
     throw err;
   }
 };
+
+export const addArticle = (values) => async (dispatch) => {
+  dispatch(addArticleRequest());
+  try {
+    const response = await api.post('/articles', { article: values });
+    dispatch(addArticleSuccess());
+  } catch (err) {
+    dispatch(addArticleFailure(err));
+    throw err;
+  }
+};
+
+export const updateArticle = (slug, values) => async (dispatch) => {
+  dispatch(updateArticleRequest());
+  try {
+    const response = await api.put(`/articles/${slug}`, { article: values });
+    dispatch(updateArticleSuccess());
+  } catch (err) {
+    dispatch(updateArticleFailure(err));
+    throw err;
+  }
+};
+
+export const deleteArticle = (slug) => async (dispatch) => {
+  dispatch(deleteArticleRequest());
+  try {
+    const response = await api.delete(`/articles/${slug}`);
+    dispatch(deleteArticleSuccess());
+  } catch (err) {
+    dispatch(deleteArticleFailure());
+    throw err;
+  }
+}

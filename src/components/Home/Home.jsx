@@ -5,13 +5,13 @@ import { Link } from 'react-router-dom';
 import formatDistanceToNow from 'date-fns/formatDistanceToNow';
 import { Button, Divider, Pagination, Tag, Card, Space, notification } from 'antd';
 import styled from 'styled-components';
+import cn from 'classnames';
 import * as actions from '../../actions';
 import * as actionsArticles from '../../actions/articles';
 import AuthWithTocken from '../../hoc/AuthWithTocken';
 import { ARTICLE_LINK, LOGIN_LINK, ADD_ARTICLE_LINK } from '../../routes/endpoints';
 import { ARTICLES_PER_PAGE } from '../../config';
 import Preloader from '../Preloader';
-import cn from 'classnames';
 
 const mapStateToProps = (state) => {
   const props = {
@@ -58,7 +58,11 @@ class Home extends React.Component {
       unFavoriteArticleFetching,
     } = this.props;
 
-    if (favorited && !favoriteArticleFetching.includes('requested') && !unFavoriteArticleFetching.includes('requested')) {
+    if (
+      favorited &&
+      !favoriteArticleFetching.includes('requested') &&
+      !unFavoriteArticleFetching.includes('requested')
+    ) {
       return unFavoriteArticle(slug);
     }
 
@@ -80,8 +84,8 @@ class Home extends React.Component {
   };
 
   openNotificationWithIcon = (message) => {
-    notification['error']({
-      message
+    notification.error({
+      message,
     });
   };
 
@@ -111,7 +115,7 @@ class Home extends React.Component {
         'like-button-icon': true,
         active: article.favorited,
         requested: `requested ${article.slug}` === favoriteArticleFetching,
-      })
+      });
 
       return (
         <ArticleWrapper key={article.slug}>
@@ -147,10 +151,7 @@ class Home extends React.Component {
                 <div className={articleLikeIconClassNames}>
                   <div className="heart" />
                 </div>
-                <div className="like-button-count">
-                  
-                  {article.favoritesCount}
-                </div>
+                <div className="like-button-count">{article.favoritesCount}</div>
               </div>
             </Card>
           </Link>
@@ -199,7 +200,13 @@ class Home extends React.Component {
         </div>
         <UserWrapper>
           <span className="user-name">{user.username}</span>
-          {isAuth ? <Button type="link" onClick={this.logout}>Log out</Button> : <Link to={LOGIN_LINK}>Log In</Link> }
+          {isAuth ? (
+            <Button type="link" onClick={this.logout}>
+              Log out
+            </Button>
+          ) : (
+            <Link to={LOGIN_LINK}>Log In</Link>
+          )}
         </UserWrapper>
         <p>
           Lorem ipsum, dolor sit amet consectetur adipisicing elit. Sint, aliquid velit repellendus
@@ -210,13 +217,7 @@ class Home extends React.Component {
         {this.renderArticles()}
         {this.renderPagination()}
 
-
-
-        { errorMessage !== '' ? (
-          <Space>
-            { this.openNotificationWithIcon(errorMessage) }
-          </Space>
-        ) : null}
+        {errorMessage !== '' ? <Space>{this.openNotificationWithIcon(errorMessage)}</Space> : null}
       </div>
     );
   }
@@ -292,7 +293,7 @@ const ArticleWrapper = styled.div`
 
       &:before,
       &:after {
-        content: "";
+        content: '';
         background-color: red;
         border-radius: 50%;
         height: 6px;
@@ -311,15 +312,11 @@ const ArticleWrapper = styled.div`
       }
 
       @keyframes heartbeat {
-        0%
-        {
-          transform: scale( 1 )
-            rotate(-45deg);    
+        0% {
+          transform: scale(1) rotate(-45deg);
         }
-        100%
-        {
-          transform: scale( 2 )
-            rotate(-45deg);
+        100% {
+          transform: scale(2) rotate(-45deg);
         }
       }
     }

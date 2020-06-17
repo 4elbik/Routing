@@ -71,10 +71,10 @@ const errorMessage = handleActions(
     },
     [actions.resetWindowErrorMessage]() {
       return '';
-    }
+    },
   },
   ''
-)
+);
 
 export default combineReducers({
   userLoginFetching,
@@ -87,4 +87,6 @@ export default combineReducers({
   favoriteArticleFetching: reducerArticle.favoriteArticleFetching,
   unFavoriteArticleFetching: reducerArticle.unFavoriteArticleFetching,
   activeTagName: reducerArticle.activeTagName,
+  editArticleFetching: reducerArticle.editArticleFetching,
+  deleteArticleFetching: reducerArticle.deleteArticleFetching,
 });

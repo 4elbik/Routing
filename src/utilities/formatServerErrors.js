@@ -14,3 +14,11 @@ export const formatLoginErrorToStr = (responseError) => {
     )
   );
 };
+
+export const formatAddArticleErrorsToFormikErrors = (responseErrors) => {
+  const errors = { ...responseErrors.response.data.errors };
+  Object.keys(errors).forEach((key) => {
+    errors[key] = `${key} ${errors[key][0].toString()}`;
+  });
+  return errors;
+};

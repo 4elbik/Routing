@@ -88,3 +88,36 @@ export const activeTagName = handleActions(
   },
   ''
 );
+
+export const editArticleFetching = handleActions(
+  {
+    [actions.updateArticleRequest]() {
+      return 'requested';
+    },
+    [actions.updateArticleSuccess]() {
+      return 'finished';
+    },
+    [actions.updateArticleFailure]() {
+      return 'failed';
+    },
+    [actions.editArticleFetchingRestored]() {
+      return 'none';
+    }
+  },
+  'none'
+);
+
+export const deleteArticleFetching = handleActions(
+  {
+    [actions.deleteArticleRequest]() {
+      return 'requested';
+    },
+    [actions.deleteArticleSuccess]() {
+      return 'finished';
+    },
+    [actions.deleteArticleFailure]() {
+      return 'failed';
+    },
+  },
+  'none'
+);
