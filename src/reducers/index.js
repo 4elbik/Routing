@@ -89,4 +89,5 @@ export default combineReducers({
   activeTagName: reducerArticle.activeTagName,
   editArticleFetching: reducerArticle.editArticleFetching,
   deleteArticleFetching: reducerArticle.deleteArticleFetching,
+  currentArticle: reducerArticle.currentArticle,
 });

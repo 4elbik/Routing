@@ -44,7 +44,8 @@ const App = (props) => {
           >
             <Signup />
           </PrivateRoute>
-          <Route path={`${routesLinks.ARTICLE_LINK}/:slug`} component={Article} />
+          <Route path={`${routesLinks.ARTICLE_LINK}/:slug`} exact component={Article} />
+          <Route path={`${routesLinks.ARTICLE_LINK}/:slug/edit`} component={AddEditArticle} />
           <PrivateRoute
             condition={isAuth}
             path={routesLinks.ADD_ARTICLE_LINK}

@@ -28,6 +28,10 @@ export const deleteArticleRequest = createAction('DELETE_ARTICLE_REQUEST');
 export const deleteArticleSuccess = createAction('DELETE_ARTICLE_SUCCESS');
 export const deleteArticleFailure = createAction('DELETE_ARTICLE_FAILURE');
 
+export const getOneArticleRequest = createAction('GET_ONE_ARTICLE_REQUEST');
+export const getOneArticleSuccess = createAction('GET_ONE_ARTICLE_SUCCESS');
+export const getOneArticleFailure = createAction('GET_ONE_ARTICLE_FAILURE');
+
 export const activeTagName = createAction('CHANGE_ACTIVE_TAG_NAME');
 
 export const editArticleFetchingRestored = createAction('RESET_EDIT_ARTICLE_FETCHING');
@@ -112,6 +116,17 @@ export const deleteArticle = (slug) => async (dispatch) => {
     dispatch(deleteArticleSuccess());
   } catch (err) {
     dispatch(deleteArticleFailure());
+    throw err;
+  }
+}
+
+export const getOneArticle = (slug) => async (dispatch) => {
+  dispatch(getOneArticleRequest());
+  try {
+    const response = await api.get(`/articles/${slug}`);
+    dispatch(getOneArticleSuccess(response.data));
+  } catch (err) {
+    dispatch(getOneArticleFailure());
     throw err;
   }
 }

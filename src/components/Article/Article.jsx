@@ -1,172 +1,177 @@
 import React from 'react';
 import { connect } from 'react-redux';
-// import PropTypes from 'prop-types';
-import { Link, withRouter } from 'react-router-dom';
-import { Divider, Button, Tag, notification } from 'antd';
-import { EditOutlined, LeftCircleOutlined } from '@ant-design/icons';
-import getArticle from '../../utilities/getArticle';
-import Preloader from '../Preloader/Preloader';
 import AuthWithTocken from '../../hoc/AuthWithTocken';
 import * as actionsArticle from '../../actions/articles';
-import AddEditArticle from '../AddEditArticle';
-import { HOME_LINK } from '../../routes/endpoints';
+import Preloader from '../Preloader';
+import styled from 'styled-components';
+import { Link } from 'react-router-dom';
+import format from 'date-fns/format';
+import { HOME_LINK, ARTICLE_LINK } from '../../routes/endpoints';
 import Page404 from '../Page404/Page404';
+import { UserOutlined, CommentOutlined, FormOutlined } from '@ant-design/icons';
+import { Divider, Tag, Space, notification } from 'antd';
+import Likes from '../Likes/Likes';
 
 const mapStateToProps = (state) => {
   const props = {
-    user: state.user,
-    oneArticleFetching: state.oneArticleFetching,
-    successMessage: state.successMessage,
-    editArticleFetching: state.editArticleFetching,
-    article: state.oneArticle,
+    username: state.user.username,
+    currentArticle: state.currentArticle,
+    errorMessage: state.errorMessage,
   };
 
   return props;
-};
+}
 
 const mapDispatchToProps = {
-  deleteArticle: actionsArticle.deleteArticle,
-  editArticleFetchingRestored: actionsArticle.editArticleFetchingRestored,
-};
-
-const openNotificationWithIcon = (message) => {
-  notification.success({
-    message,
-  });
+  getArticle: actionsArticle.getOneArticle,
 };
 
 class Article extends React.Component {
-  state = {
-    article: false,
-    articleFetching: 'requested',
-    edit: false,
-  };
-
   componentDidMount() {
-    this.getArticle();
+    const { getArticle, match: { params : { slug } } } = this.props;
+    getArticle(slug);
   }
 
-  // componentWillUnmount() {
-  //   console.log('componen анмаунтнулся')
-  //   this.setState({ article: false });
-  // }
-
-  getArticle = async () => {
-    const response = await getArticle(this.props.match.params.slug);
-    if (!response) {
-      return this.setState({ articleFetching: 'failed' });
-    }
-    this.setState({ article: response.article, articleFetching: 'finished' });
+  openNotificationWithIcon = (message) => {
+    notification.error({
+      message,
+    });
   };
 
-  handleEdit = () => {
-    this.setState({ edit: true });
-  };
-
-  handleEditSuccess = () => {
-    const { match, history } = this.props;
-    this.setState({ edit: false }, () => history.push(match.url));
-  };
-
-  handleCancelEdit = () => {
-    const { match, history } = this.props;
-    this.setState({ edit: false }, () => history.push(match.url));
-  };
-
-  handleDeleteArticle = (slug) => async (evt) => {
-    evt.preventDefault();
-    const { deleteArticle, history } = this.props;
-    try {
-      await deleteArticle(slug);
-      openNotificationWithIcon('Article successful delete');
-      history.push(HOME_LINK);
-    } catch (err) {
-      console.log(err, 'error on delete article');
-    }
-  }
-
-  renderEditLink() {
-    const { article } = this.state;
-    const { user, match } = this.props;
-
-    if (user.username === article.author.username) {
-      return (
-        <Link to={`${match.url}/edit`}>
-          <Button onClick={this.handleEdit}>
-            <EditOutlined />
-            Edit
-          </Button>
-        </Link>
-      );
-    }
-
-    return null;
-  }
-
-  componentDidUpdate() {
-    const { edit } = this.state;
-    const { editArticleFetching } = this.props;
-
-    if (editArticleFetching === 'finished') {
-      this.handleEditSuccess();
-      // this.getArticle();
-    }
-  }
-  
   render() {
-    const { article, articleFetching, edit } = this.state;
-    const { editArticleFetching, editArticleFetchingRestored } = this.props;
+    const { username, currentArticle: { fetching, article }, errorMessage } = this.props;
 
-    if (articleFetching === 'failed') return <Page404 />;
+    if (fetching === 'failed') return <Page404 />;
 
-    if (articleFetching === 'requested' || editArticleFetching === 'requested') {
-      console.log('Тут происходит рендер прелоадера')
-      return <Preloader />;
-    }
-
-    if (edit) {
-      const initialValues = {
-        title: article.title,
-        description: article.description,
-        body: article.body,
-        tagList: article.tagList,
-      };
-      return (
-        <AddEditArticle
-          edit
-          slug={article.slug}
-          initialValues={initialValues}
-          returnToArticle={this.handleCancelEdit}
-          deleteArticle={this.handleDeleteArticle}
-        />
-      );
-    }
-
-    if (editArticleFetching === 'finished') {
-      editArticleFetchingRestored();
-    }
+    if (fetching !== 'finished') return <Preloader />;
 
     return (
-      <div className="content">
-        <div className="return-back-arrow">
-          <Link to={HOME_LINK}>
-            <LeftCircleOutlined style={{ fontSize: '20px' }} />
-          </Link>
-        </div>
-        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+      <ArticleWrapper>
+        <div className="content">
+          <div className="back-arrow"><Link to={HOME_LINK}>&larr;</Link></div>
+          { article.author && article.author.username === username ? (
+            <div className="edit-link">
+              <Link to={`${ARTICLE_LINK}/${article.slug}/edit`}><FormOutlined /></Link>
+            </div>
+          ) : null }
           <h1>{article.title}</h1>
-          {this.renderEditLink()}
+          <div className="info">
+            <div><time>{format(new Date(article.createdAt), 'yyyy-MM-dd HH:mm')}</time><span><UserOutlined className="icon-author" />{article.author.username}</span></div>
+          </div>
+          <div className="likes-comments">
+            <Likes article={article} />
+            <div className="comments"><CommentOutlined style={{ color: '#a8adb8' }} /></div>
+          </div>
+          <Divider />
+          <div className="description">
+            {article.description}
+          </div>
+          <Divider />
+          <div className="body">
+            {article.body}
+          </div>
+          { article.tagList.length > 0 ? (
+            <div className="tags">
+              { article.tagList.map((el) => <Tag key={el} color="#108ee9">{el}</Tag>) }
+            </div>
+          ) : null}
         </div>
-        <Divider />
-
-        <div>{article.description}</div>
-        {article.body}
-        <div style={{ marginTop: '50px' }}>{article.tagList.map((el) => <Tag key={el} color="#108ee9">{el}</Tag>)}</div>
-      </div>
+        
+        {errorMessage !== '' ? <Space>{this.openNotificationWithIcon(errorMessage)}</Space> : null}
+      </ArticleWrapper>
     );
   }
 }
 
+const ArticleWrapper = styled.div`
+  width: 100%;
+
+  & .content {
+    position: relative;
+    margin: 0 auto;
+  }
+
+  & .back-arrow,
+  & .edit-link {
+    position: absolute;
+    top: 25px;
+    left: -52px;
+
+    padding: 7px 6px 13px 10px;
+
+    & a {
+      color: #fff;
+      opacity: 0.7;
+    }
+    font-size: 40px;
+    line-height: 1;
+
+    background-color: #1890ff;
+    border-radius: 5px;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    box-shadow: inset 0px 0px 2px black;
+
+    &:hover {
+      background-color: #186aff;
+      box-shadow: inset 0px 0px 5px black;
+      cursor: pointer;
+
+      & a {
+        opacity: 0.9;
+      }
+    }
+  }
+
+  & .edit-link {
+    top: 100px;
+
+    padding: 11px 7px 13px 8px;
+
+    font-size: 35px;
+
+    background-color: #47b747;
+
+    &:hover {
+      background-color: #3d9c3d;
+    }
+  }
+
+  & .info {
+    margin-bottom: 10px;
+
+    & div {
+      display: flex;
+      justify-content: space-between;
+
+      & .icon-author {
+        margin-right: 3px;
+      }
+    }
+  }
+
+  & .likes-comments {
+    display: flex;
+
+    & > div {
+      margin-right: 30px;
+
+      // While i have not <Comments /> component
+      &.comments {
+        font-size: 24px;
+      }
+    }
+  }
+  
+  & .body {
+    white-space: pre-line;
+  }
+
+  & .tags {
+    margin-top: 20px;
+  }
+`;
+
 const IfTockenExists = AuthWithTocken(Article);
 
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(IfTockenExists));
+export default connect(mapStateToProps, mapDispatchToProps)(IfTockenExists);

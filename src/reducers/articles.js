@@ -121,3 +121,24 @@ export const deleteArticleFetching = handleActions(
   },
   'none'
 );
+
+export const currentArticle = handleActions(
+  {
+    [actions.getOneArticleRequest](state) {
+      return { ...state, fetching: 'requested' };
+    },
+    [actions.getOneArticleSuccess](state, { payload: { article } }) {
+      return { ...state, fetching: 'finished', article };
+    },
+    [actions.getOneArticleFailure](state) {
+      return { ...state, fetching: 'failed' };
+    },
+    [actions.favoriteArticleSuccess](state, { payload: { article } }) {
+      return { ...state, article };
+    },
+    [actions.unFavoriteArticleSuccess](state, { payload: { article } }) {
+      return { ...state, article };
+    }
+  },
+  { fetching: 'none', article: {} }
+);

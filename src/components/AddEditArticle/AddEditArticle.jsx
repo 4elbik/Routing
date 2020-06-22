@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Formik, Form, Field } from 'formik';
-import { withRouter } from 'react-router-dom';
+import { withRouter, Link, Redirect } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { Divider, Input, Button, notification } from 'antd';
 import styled from 'styled-components';
@@ -11,10 +11,23 @@ import EditableTagGroup from '../AddTags';
 import * as actionsArticles from '../../actions/articles';
 import { formatAddArticleErrorsToFormikErrors } from '../../utilities/formatServerErrors';
 import { HOME_LINK } from '../../routes/endpoints';
+import Preloader from '../Preloader';
+
+const mapStateToProps = (state) => {
+  const props = {
+    userLoginFetching: state.userLoginFetching,
+    currentArticle: state.currentArticle,
+    username: state.user.username,
+  };
+
+  return props;
+}
 
 const mapDispatchToProps = {
   addArticle: actionsArticles.addArticle,
+  getArticle: actionsArticles.getOneArticle,
   updateArticle: actionsArticles.updateArticle,
+  deleteArticle: actionsArticles.deleteArticle,
 };
 
 const fieldErrorClassNames = (field, errors, touched) => {
@@ -30,120 +43,195 @@ const openNotificationWithIcon = (message) => {
 const AddEditArticle = (props) => {
   const {
     history,
+    userLoginFetching,
     addArticle,
+    getArticle,
     updateArticle,
-    deleteArticle = () => {},
-    initialValues = {
-      title: '',
-      description: '',
-      body: '',
-      tagList: [],
-    },
-    edit = false,
-    returnToArticle = () => {},
-    slug = '',
+    deleteArticle,
+    match,
+    match: { params: { slug } },
+    currentArticle: { fetching, article },
+    username,
   } = props;
 
+  let initialValues = {
+    title: '',
+    description: '',
+    body: '',
+    tagList: [],
+  };
+  let edit = false;
+  let linkToBackOnEditMode = '';
+  
+  if (Object.keys(article).length !== 0 && !match.url.includes('/add')) {
+    initialValues = {
+      title: article.title,
+      description: article.description,
+      body: article.body,
+      tagList: article.tagList,
+    };
+    edit = true;
+    linkToBackOnEditMode = match.url.replace('/edit', '');
+  } else if (slug && fetching === 'none') {
+    getArticle(slug);
+  }
+
+  if (fetching === 'failed') return <Redirect to={match.url.replace('/edit', '')} />;
+
+  if (!match.url.includes('/add') && !edit && (fetching !== 'finished')) return <Preloader />;
+
+  if (edit && username !== article.author.username) return <Redirect to={match.url.replace('/edit', '')} />;
+
   return (
-    <div className="content add-article-wrapper">
-      {edit ? (
-        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <h1>Edit article "{initialValues.title}"</h1>
-          <Button onClick={deleteArticle(slug)} danger>Delete article</Button>
-        </div>
-      ) : <h1>Add new article</h1>}
-      <Divider />
-
-      <Formik
-        enableReinitialize
-        initialValues={initialValues}
-        onSubmit={async (values, { setErrors }) => {
-          try {
-            if (edit) {
-              const newValues = {...values};
-              if (values.tagList.length === 0) {
-                newValues.tagList = [''];
-              }
-              await updateArticle(slug, newValues);
-              openNotificationWithIcon('Article successful updated');
-            } else {
-              await addArticle(values);
+    <AddEditArticleWrapper>
+      <div className="content">
+        <div className="back-arrow"><Link to={edit ? linkToBackOnEditMode : HOME_LINK}>&larr;</Link></div>
+        {edit ? (
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <h1>Edit article "{initialValues.title}"</h1>
+            <Button onClick={async () => {
+              await deleteArticle(slug);
               history.push(HOME_LINK);
-              openNotificationWithIcon('Article successful add');
+              openNotificationWithIcon('Article successful delete');
+            }} danger>Delete article</Button>
+          </div>
+        ) : <h1>Add new article</h1>}
+        <Divider />
+
+        <Formik
+          enableReinitialize
+          initialValues={initialValues}
+          onSubmit={async (values, { setErrors }) => {
+            try {
+              if (edit) {
+                const newValues = {...values};
+                if (values.tagList.length === 0) {
+                  newValues.tagList = [''];
+                }
+                await updateArticle(slug, newValues);
+                history.push(linkToBackOnEditMode);
+                openNotificationWithIcon('Article successful updated');
+              } else {
+                await addArticle(values);
+                history.push(HOME_LINK);
+                openNotificationWithIcon('Article successful add');
+              }
+            } catch (err) {
+              const newErrors = formatAddArticleErrorsToFormikErrors(err);
+              setErrors(newErrors);
             }
-          } catch (err) {
-            const newErrors = formatAddArticleErrorsToFormikErrors(err);
-            setErrors(newErrors);
-          }
-        }}
-      >
-        {({ values, setFieldValue, errors, touched }) => (
-          <Form>
-            <InputWrapper>
-              <Field
-                as={Input}
-                name="title"
-                placeholder="Title"
-                className={fieldErrorClassNames('title', errors, touched)}
-              />
-              {errors.title && touched.title && <span className="error-text">{errors.title}</span>}
-            </InputWrapper>
-            <InputWrapper>
-              <Field
-                as={Input}
-                name="description"
-                placeholder="Short description"
-                className={fieldErrorClassNames('description', errors, touched)}
-              />
-              { (() => { console.log('Тут что-то происходит (AddEditArticle)'); return null })() }
-              {errors.description && touched.description && (
-                <span className="error-text">{errors.description}</span>
+          }}
+        >
+          {({ values, setFieldValue, errors, touched }) => (
+            <Form>
+              <InputWrapper>
+                <Field
+                  as={Input}
+                  name="title"
+                  placeholder="Title"
+                  className={fieldErrorClassNames('title', errors, touched)}
+                />
+                {errors.title && touched.title && <span className="error-text">{errors.title}</span>}
+              </InputWrapper>
+              <InputWrapper>
+                <Field
+                  as={Input}
+                  name="description"
+                  placeholder="Short description"
+                  className={fieldErrorClassNames('description', errors, touched)}
+                />
+                { (() => { console.log('Тут что-то происходит (AddEditArticle)'); return null })() }
+                {errors.description && touched.description && (
+                  <span className="error-text">{errors.description}</span>
+                )}
+              </InputWrapper>
+              <InputWrapper>
+                <Field
+                  as={Input.TextArea}
+                  name="body"
+                  autoSize={{ minRows: 5 }}
+                  placeholder="Article body"
+                  className={fieldErrorClassNames('body', errors, touched)}
+                />
+                {errors.body && touched.body && <span className="error-text">{errors.body}</span>}
+              </InputWrapper>
+
+              <InputWrapper>
+                <EditableTagGroup
+                  tagList={values.tagList}
+                  updateTagList={(tags) => {
+                    setFieldValue('tagList', tags);
+                  }}
+                />
+              </InputWrapper>
+
+              {edit ? (
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <Button
+                    htmlType="submit"
+                    style={{ backgroundColor: '#3cd03c', color: '#fff', borderColor: '#12ad12' }}
+                  >
+                    Save
+                  </Button>
+
+                  <Button danger>
+                    <Link to={linkToBackOnEditMode}>
+                      Cancel
+                    </Link>
+                  </Button>
+                </div>
+              ) : (
+                <Button type="primary" htmlType="submit">
+                  Add article
+                </Button>
               )}
-            </InputWrapper>
-            <InputWrapper>
-              <Field
-                as={Input.TextArea}
-                name="body"
-                autoSize={{ minRows: 5 }}
-                placeholder="Article body"
-                className={fieldErrorClassNames('body', errors, touched)}
-              />
-              {errors.body && touched.body && <span className="error-text">{errors.body}</span>}
-            </InputWrapper>
-
-            <InputWrapper>
-              <EditableTagGroup
-                tagList={values.tagList}
-                updateTagList={(tags) => {
-                  setFieldValue('tagList', tags);
-                }}
-              />
-            </InputWrapper>
-
-            {edit ? (
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Button
-                  htmlType="submit"
-                  style={{ backgroundColor: '#3cd03c', color: '#fff', borderColor: '#12ad12' }}
-                >
-                  Save
-                </Button>
-
-                <Button danger onClick={returnToArticle}>
-                  Cancel
-                </Button>
-              </div>
-            ) : (
-              <Button type="primary" htmlType="submit">
-                Add article
-              </Button>
-            )}
-          </Form>
-        )}
-      </Formik>
-    </div>
+            </Form>
+          )}
+        </Formik>
+      </div>
+    </AddEditArticleWrapper>
   );
 };
+
+const AddEditArticleWrapper = styled.div`
+  width: 100%;
+
+  & .content {
+    position: relative;
+    margin: 0 auto;
+  }
+
+  & .back-arrow {
+    position: absolute;
+    top: 25px;
+    left: -52px;
+
+    padding: 7px 6px 13px 10px;
+
+    & a {
+      color: #fff;
+      opacity: 0.7;
+    }
+    font-size: 40px;
+    line-height: 1;
+
+    background-color: #1890ff;
+    border-radius: 5px;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    box-shadow: inset 0px 0px 2px black;
+
+    &:hover {
+      background-color: #186aff;
+      box-shadow: inset 0px 0px 5px black;
+      cursor: pointer;
+
+      & a {
+        opacity: 0.9;
+      }
+    }
+  }
+`;
 
 const InputWrapper = styled.div`
   margin-bottom: 20px;
@@ -164,4 +252,4 @@ AddEditArticle.propTypes = {
 
 const IfTockenExists = AuthWithTocken(AddEditArticle);
 
-export default connect(null, mapDispatchToProps)(withRouter(IfTockenExists));
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(IfTockenExists));
