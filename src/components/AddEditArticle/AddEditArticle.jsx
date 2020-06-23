@@ -21,7 +21,7 @@ const mapStateToProps = (state) => {
   };
 
   return props;
-}
+};
 
 const mapDispatchToProps = {
   addArticle: actionsArticles.addArticle,
@@ -43,13 +43,14 @@ const openNotificationWithIcon = (message) => {
 const AddEditArticle = (props) => {
   const {
     history,
-    userLoginFetching,
     addArticle,
     getArticle,
     updateArticle,
     deleteArticle,
     match,
-    match: { params: { slug } },
+    match: {
+      params: { slug },
+    },
     currentArticle: { fetching, article },
     username,
   } = props;
@@ -62,7 +63,7 @@ const AddEditArticle = (props) => {
   };
   let edit = false;
   let linkToBackOnEditMode = '';
-  
+
   if (Object.keys(article).length !== 0 && !match.url.includes('/add')) {
     initialValues = {
       title: article.title,
@@ -78,24 +79,35 @@ const AddEditArticle = (props) => {
 
   if (fetching === 'failed') return <Redirect to={match.url.replace('/edit', '')} />;
 
-  if (!match.url.includes('/add') && !edit && (fetching !== 'finished')) return <Preloader />;
+  if (!match.url.includes('/add') && !edit && fetching !== 'finished') return <Preloader />;
 
-  if (edit && username !== article.author.username) return <Redirect to={match.url.replace('/edit', '')} />;
+  if (edit && username !== article.author.username) {
+    return <Redirect to={match.url.replace('/edit', '')} />;
+  }
 
   return (
     <AddEditArticleWrapper>
       <div className="content">
-        <div className="back-arrow"><Link to={edit ? linkToBackOnEditMode : HOME_LINK}>&larr;</Link></div>
+        <div className="back-arrow">
+          <Link to={edit ? linkToBackOnEditMode : HOME_LINK}>&larr;</Link>
+        </div>
         {edit ? (
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             <h1>Edit article "{initialValues.title}"</h1>
-            <Button onClick={async () => {
-              await deleteArticle(slug);
-              history.push(HOME_LINK);
-              openNotificationWithIcon('Article successful delete');
-            }} danger>Delete article</Button>
+            <Button
+              onClick={async () => {
+                await deleteArticle(slug);
+                history.push(HOME_LINK);
+                openNotificationWithIcon('Article successful delete');
+              }}
+              danger
+            >
+              Delete article
+            </Button>
           </div>
-        ) : <h1>Add new article</h1>}
+        ) : (
+          <h1>Add new article</h1>
+        )}
         <Divider />
 
         <Formik
@@ -104,7 +116,7 @@ const AddEditArticle = (props) => {
           onSubmit={async (values, { setErrors }) => {
             try {
               if (edit) {
-                const newValues = {...values};
+                const newValues = { ...values };
                 if (values.tagList.length === 0) {
                   newValues.tagList = [''];
                 }
@@ -131,7 +143,9 @@ const AddEditArticle = (props) => {
                   placeholder="Title"
                   className={fieldErrorClassNames('title', errors, touched)}
                 />
-                {errors.title && touched.title && <span className="error-text">{errors.title}</span>}
+                {errors.title && touched.title && (
+                  <span className="error-text">{errors.title}</span>
+                )}
               </InputWrapper>
               <InputWrapper>
                 <Field
@@ -140,7 +154,6 @@ const AddEditArticle = (props) => {
                   placeholder="Short description"
                   className={fieldErrorClassNames('description', errors, touched)}
                 />
-                { (() => { console.log('Тут что-то происходит (AddEditArticle)'); return null })() }
                 {errors.description && touched.description && (
                   <span className="error-text">{errors.description}</span>
                 )}
@@ -175,9 +188,7 @@ const AddEditArticle = (props) => {
                   </Button>
 
                   <Button danger>
-                    <Link to={linkToBackOnEditMode}>
-                      Cancel
-                    </Link>
+                    <Link to={linkToBackOnEditMode}>Cancel</Link>
                   </Button>
                 </div>
               ) : (
@@ -246,8 +257,19 @@ const InputWrapper = styled.div`
   }
 `;
 
+AddEditArticle.defaultProps = {
+  username: '',
+};
+
 AddEditArticle.propTypes = {
   addArticle: PropTypes.func.isRequired,
+  getArticle: PropTypes.func.isRequired,
+  updateArticle: PropTypes.func.isRequired,
+  deleteArticle: PropTypes.func.isRequired,
+  match: PropTypes.instanceOf(Object).isRequired,
+  history: PropTypes.instanceOf(Object).isRequired,
+  username: PropTypes.string,
+  currentArticle: PropTypes.instanceOf(Object).isRequired,
 };
 
 const IfTockenExists = AuthWithTocken(AddEditArticle);

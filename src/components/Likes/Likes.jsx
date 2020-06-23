@@ -44,7 +44,7 @@ class Likes extends React.Component {
   };
 
   render() {
-    const { article, favoriteArticleFetching, style = {} } = this.props;
+    const { article, favoriteArticleFetching, style } = this.props;
 
     const articleLikeIconClassNames = cn({
       'like-button-icon': true,
@@ -73,7 +73,7 @@ const LikeButtonWrapper = styled.div`
 
   &:hover {
     cursor: pointer;
-  
+
     & .like-button-icon {
       opacity: 1;
     }
@@ -148,8 +148,17 @@ const LikeButtonWrapper = styled.div`
   }
 `;
 
+Likes.defaultProps = {
+  style: {},
+};
+
 Likes.propTypes = {
   article: PropTypes.instanceOf(Object).isRequired,
-}
+  favoriteArticle: PropTypes.func.isRequired,
+  unFavoriteArticle: PropTypes.func.isRequired,
+  favoriteArticleFetching: PropTypes.string.isRequired,
+  unFavoriteArticleFetching: PropTypes.string.isRequired,
+  style: PropTypes.instanceOf(Object),
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(Likes);

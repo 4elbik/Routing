@@ -118,7 +118,7 @@ export const deleteArticle = (slug) => async (dispatch) => {
     dispatch(deleteArticleFailure());
     throw err;
   }
-}
+};
 
 export const getOneArticle = (slug) => async (dispatch) => {
   dispatch(getOneArticleRequest());
@@ -129,4 +129,4 @@ export const getOneArticle = (slug) => async (dispatch) => {
     dispatch(getOneArticleFailure());
     throw err;
   }
-}
+};

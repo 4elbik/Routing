@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import React from 'react';
 import 'antd/dist/antd.css';
 import { Tag, Input, Tooltip } from 'antd';

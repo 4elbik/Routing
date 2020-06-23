@@ -157,11 +157,13 @@ class Home extends React.Component {
     return (
       <HomeWrapper>
         <div className="content">
-          { isAuth ? (
+          {isAuth ? (
             <div className="add-new-article">
-              <Link to={ADD_ARTICLE_LINK} title="Add new article"><FileAddOutlined /></Link>
+              <Link to={ADD_ARTICLE_LINK} title="Add new article">
+                <FileAddOutlined />
+              </Link>
             </div>
-          ) : null }
+          ) : null}
           <h1>Home page</h1>
           <UserWrapper>
             <span className="user-name">{user.username}</span>
@@ -174,15 +176,17 @@ class Home extends React.Component {
             )}
           </UserWrapper>
           <p>
-            Lorem ipsum, dolor sit amet consectetur adipisicing elit. Sint, aliquid velit repellendus
-            accusamus quasi consequuntur. Perspiciatis eos error natus rem laborum, reiciendis omnis,
-            maxime sapiente ducimus tempora molestias aut officia.
+            Lorem ipsum, dolor sit amet consectetur adipisicing elit. Sint, aliquid velit
+            repellendus accusamus quasi consequuntur. Perspiciatis eos error natus rem laborum,
+            reiciendis omnis, maxime sapiente ducimus tempora molestias aut officia.
           </p>
           <Divider />
           {this.renderArticles()}
           {this.renderPagination()}
 
-          {errorMessage !== '' ? <Space>{this.openNotificationWithIcon(errorMessage)}</Space> : null}
+          {errorMessage !== '' ? (
+            <Space>{this.openNotificationWithIcon(errorMessage)}</Space>
+          ) : null}
         </div>
       </HomeWrapper>
     );
@@ -256,6 +260,8 @@ const ArticleWrapper = styled.div`
 
 Home.defaultProps = {
   user: {},
+  errorMessage: '',
+  activeTagName: '',
 };
 
 Home.propTypes = {
@@ -264,6 +270,10 @@ Home.propTypes = {
   logout: PropTypes.func.isRequired,
   articlesObj: PropTypes.instanceOf(Object).isRequired,
   getArticles: PropTypes.func.isRequired,
+  articlesFetching: PropTypes.string.isRequired,
+  activeTagName: PropTypes.string,
+  changeActiveTagName: PropTypes.bool.isRequired,
+  errorMessage: PropTypes.string,
 };
 
 const IfTockenExists = AuthWithTocken(Home);

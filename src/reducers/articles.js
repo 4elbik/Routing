@@ -102,7 +102,7 @@ export const editArticleFetching = handleActions(
     },
     [actions.editArticleFetchingRestored]() {
       return 'none';
-    }
+    },
   },
   'none'
 );
@@ -138,7 +138,7 @@ export const currentArticle = handleActions(
     },
     [actions.unFavoriteArticleSuccess](state, { payload: { article } }) {
       return { ...state, article };
-    }
+    },
   },
   { fetching: 'none', article: {} }
 );
