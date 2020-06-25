@@ -1,7 +1,5 @@
 import { createAction } from 'redux-actions';
-import api from '../fetchConfig';
-import { ARTICLES_PER_PAGE } from '../config';
-import { skipArticlesCounter } from '../utilities/pagination';
+import apiService from '../fetchConfig';
 import { resetWindowErrorMessage } from '.';
 
 export const articlesRequest = createAction('GET_ARTICLES_REQUEST');
@@ -39,15 +37,7 @@ export const editArticleFetchingRestored = createAction('RESET_EDIT_ARTICLE_FETC
 export const getArticles = (options) => async (dispatch) => {
   dispatch(articlesRequest());
   try {
-    let endPoint = `/articles?limit=${ARTICLES_PER_PAGE}`;
-    if (options && options.tagName !== '') {
-      endPoint += `&tag=${options.tagName}`;
-    }
-    if (options && options.pageNumber) {
-      const counter = skipArticlesCounter(options.pageNumber, ARTICLES_PER_PAGE);
-      endPoint += `&offset=${counter}`;
-    }
-    const response = await api.get(endPoint);
+    const response = await apiService.get('/articles', options);
     dispatch(articlesSuccess({ articlesObj: response.data }));
   } catch (err) {
     dispatch(articlesFailure());
@@ -58,7 +48,7 @@ export const getArticles = (options) => async (dispatch) => {
 export const favoriteArticle = (slug) => async (dispatch) => {
   dispatch(favoriteArticleRequest(slug));
   try {
-    const response = await api.post(`/articles/${slug}/favorite`);
+    const response = await apiService.post(`/articles/${slug}/favorite`);
     dispatch(favoriteArticleSuccess({ slug, article: response.data.article }));
   } catch (err) {
     if (err.response.status === 401) {
@@ -74,7 +64,7 @@ export const favoriteArticle = (slug) => async (dispatch) => {
 export const unFavoriteArticle = (slug) => async (dispatch) => {
   dispatch(unFavoriteArticleRequest(slug));
   try {
-    const response = await api.delete(`/articles/${slug}/favorite`);
+    const response = await apiService.delete(`/articles/${slug}/favorite`);
     dispatch(unFavoriteArticleSuccess({ slug, article: response.data.article }));
   } catch (err) {
     if (err.response.status === 401) {
@@ -90,7 +80,7 @@ export const unFavoriteArticle = (slug) => async (dispatch) => {
 export const addArticle = (values) => async (dispatch) => {
   dispatch(addArticleRequest());
   try {
-    const response = await api.post('/articles', { article: values });
+    const response = await apiService.post('/articles', { article: values });
     dispatch(addArticleSuccess());
   } catch (err) {
     dispatch(addArticleFailure(err));
@@ -101,7 +91,7 @@ export const addArticle = (values) => async (dispatch) => {
 export const updateArticle = (slug, values) => async (dispatch) => {
   dispatch(updateArticleRequest());
   try {
-    const response = await api.put(`/articles/${slug}`, { article: values });
+    const response = await apiService.put(`/articles/${slug}`, { article: values });
     dispatch(updateArticleSuccess());
   } catch (err) {
     dispatch(updateArticleFailure(err));
@@ -112,7 +102,7 @@ export const updateArticle = (slug, values) => async (dispatch) => {
 export const deleteArticle = (slug) => async (dispatch) => {
   dispatch(deleteArticleRequest());
   try {
-    const response = await api.delete(`/articles/${slug}`);
+    const response = await apiService.delete(`/articles/${slug}`);
     dispatch(deleteArticleSuccess());
   } catch (err) {
     dispatch(deleteArticleFailure());
@@ -123,7 +113,7 @@ export const deleteArticle = (slug) => async (dispatch) => {
 export const getOneArticle = (slug) => async (dispatch) => {
   dispatch(getOneArticleRequest());
   try {
-    const response = await api.get(`/articles/${slug}`);
+    const response = await apiService.get(`/articles/${slug}`);
     dispatch(getOneArticleSuccess(response.data));
   } catch (err) {
     dispatch(getOneArticleFailure());

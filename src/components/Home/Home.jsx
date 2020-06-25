@@ -13,6 +13,7 @@ import { ARTICLE_LINK, LOGIN_LINK, ADD_ARTICLE_LINK } from '../../routes/endpoin
 import { ARTICLES_PER_PAGE } from '../../config';
 import Preloader from '../Preloader';
 import Likes from '../Likes/Likes';
+import skipArticlesCounter from '../../utilities/pagination';
 
 const mapStateToProps = (state) => {
   const props = {
@@ -53,12 +54,13 @@ class Home extends React.Component {
     evt.preventDefault();
     const { getArticles, changeActiveTagName } = this.props;
     changeActiveTagName(tagName);
-    getArticles({ tagName });
+    getArticles({ tag: tagName });
   };
 
   handleChangePageNumber = (pageNumber) => {
     const { getArticles, activeTagName } = this.props;
-    getArticles({ tagName: activeTagName, pageNumber });
+    const counter = skipArticlesCounter(pageNumber, ARTICLES_PER_PAGE);
+    getArticles({ tag: activeTagName, offset: counter });
   };
 
   openNotificationWithIcon = (message) => {
@@ -272,7 +274,7 @@ Home.propTypes = {
   getArticles: PropTypes.func.isRequired,
   articlesFetching: PropTypes.string.isRequired,
   activeTagName: PropTypes.string,
-  changeActiveTagName: PropTypes.bool.isRequired,
+  changeActiveTagName: PropTypes.func.isRequired,
   errorMessage: PropTypes.string,
 };
 

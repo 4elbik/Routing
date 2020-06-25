@@ -1,5 +1,5 @@
 import { createAction } from 'redux-actions';
-import api from '../fetchConfig';
+import apiService from '../fetchConfig';
 import { formatLoginErrorToStr } from '../utilities/formatServerErrors';
 
 export const loginUserRequest = createAction('USER_LOGIN_REQUEST');
@@ -18,7 +18,7 @@ export const resetWindowErrorMessage = createAction('RESET_WINDOW_ERRORS_MESSAGE
 export const loginUser = (user) => async (dispatch) => {
   dispatch(loginUserRequest());
   try {
-    const response = await api.post('/users/login', { user });
+    const response = await apiService.post('/users/login', { user });
     localStorage.setItem('token', response.data.user.token);
     dispatch(loginUserSuccess(response.data));
   } catch (err) {
@@ -31,7 +31,7 @@ export const loginUser = (user) => async (dispatch) => {
 export const loginUserToken = () => async (dispatch) => {
   dispatch(loginUserRequest());
   try {
-    const response = await api.get('/user');
+    const response = await apiService.get('/user');
     localStorage.setItem('token', response.data.user.token);
     dispatch(loginUserSuccess(response.data));
   } catch (err) {
@@ -45,7 +45,7 @@ export const loginUserToken = () => async (dispatch) => {
 export const registerUser = (user) => async (dispatch) => {
   dispatch(registerUserRequest());
   try {
-    await api.post('/users', { user });
+    await apiService.post('/users', { user });
     dispatch(registerUserSuccess());
   } catch (err) {
     dispatch(registerUserFailure());
